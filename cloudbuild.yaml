@@ -20,17 +20,17 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID']
 
-  # Step 4: Create a Cloud Deploy release
+  # Step 4: Create a release in Cloud Deploy
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
     args:
-      - 'deploy'
-      - 'releases'
-      - 'create'
-      - 'release-$BUILD_ID'
-      - '--delivery-pipeline=demo-amjad'
-      - '--region=us-central1'
-      - '--images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID'
-      - '--project=enhub-cloud-interns'
+      - '-c'
+      - |
+        gcloud deploy releases create release-$BUILD_ID \
+          --project=enhub-cloud-interns \
+          --region=us-central1 \
+          --delivery-pipeline=demo-amjad \
+          --images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID
 
 images:
   - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID'
