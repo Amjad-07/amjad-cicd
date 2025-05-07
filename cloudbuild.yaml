@@ -20,9 +20,21 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest']
 
+  # Step 4: Trigger Cloud Deploy release
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'deploy'
+      - 'releases'
+      - 'create'
+      - 'release-$(date +%Y%m%d%H%M%S)'
+      - '--delivery-pipeline=demo-amjad'
+      - '--region=us-central1'
+      - '--images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
+      - '--source=.'
+
 images:
   - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
