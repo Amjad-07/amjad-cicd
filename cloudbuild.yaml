@@ -14,27 +14,26 @@ steps:
 
   # Step 2: Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID', '.']
 
   # Step 3: Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest']
+    args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID']
 
-  # Step 4: Trigger Cloud Deploy release
+  # Step 4: Create a Cloud Deploy release
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
     args:
       - 'deploy'
       - 'releases'
       - 'create'
-      - 'release-$(date +%Y%m%d%H%M%S)'
+      - 'release-$BUILD_ID'
       - '--delivery-pipeline=demo-amjad'
       - '--region=us-central1'
-      - '--images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
-      - '--source=.'
+      - '--images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID'
+      - '--project=enhub-cloud-interns'
 
 images:
-  - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
+  - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID'
 
 options:
   logging: CLOUD_LOGGING_ONLY
