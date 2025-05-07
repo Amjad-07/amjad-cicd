@@ -14,26 +14,39 @@ steps:
 
   # Step 2: Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest', '.']
 
   # Step 3: Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID']
+    args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest']
 
-  # Step 4: Create a release in Cloud Deploy
+  # Step 4: Deploy using Skaffold
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud deploy releases create release-$BUILD_ID \
-          --project=enhub-cloud-interns \
-          --region=us-central1 \
-          --delivery-pipeline=demo-amjad \
-          --images=my-app=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID
+        echo "Creating skaffold.yaml for deployment"
+        cat > skaffold.yaml <<EOF
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: my-app
+build:
+  artifacts:
+    - image: us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app
+deploy:
+  cloudrun:
+    region: us-central1
+    projectId: enhub-cloud-interns
+    serviceName: demo-amjad-target-1  # Cloud Run service name
+EOF
+
+        # Use Skaffold for deployment
+        skaffold run --default-repo=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo
 
 images:
-  - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:$BUILD_ID'
+  - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
