@@ -20,33 +20,9 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest']
 
-  # Step 4: Deploy using Skaffold
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "Creating skaffold.yaml for deployment"
-        cat > skaffold.yaml <<EOF
-apiVersion: skaffold/v2beta29
-kind: Config
-metadata:
-  name: my-app
-build:
-  artifacts:
-    - image: us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app
-deploy:
-  cloudrun:
-    region: us-central1
-    projectId: enhub-cloud-interns
-    serviceName: demo-amjad-target-1  # Cloud Run service name
-EOF
-
-        # Use Skaffold for deployment
-        skaffold run --default-repo=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo
-
 images:
   - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
