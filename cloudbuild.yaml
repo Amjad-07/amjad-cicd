@@ -1,5 +1,5 @@
 steps:
-  # Step 1: Check/create Artifact Registry
+  # Step 1: Check/Create Artifact Registry
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
@@ -19,6 +19,47 @@ steps:
   # Step 3: Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest']
+
+  # Step 4: Create Delivery Pipeline (Cloud Deploy)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'deploy'
+      - 'delivery-pipelines'
+      - 'create'
+      - 'my-pipeline'
+      - '--region=us-central1'
+      - '--project=enhub-cloud-interns'
+      - '--file=-'  # This will apply the pipeline from stdin
+
+  # Step 5: Apply Cloud Run Targets (Cloud Deploy)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'deploy'
+      - 'targets'
+      - 'apply'
+      - '--file=-'  # This will apply the target configuration from stdin
+
+  # Step 6: Trigger Cloud Deploy release
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'deploy'
+      - 'releases'
+      - 'create'
+      - '--delivery-pipeline=my-pipeline'
+      - '--region=us-central1'
+      - '--project=enhub-cloud-interns'
+      - '--image=us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
+
+  # Step 7: Promote the release to production (if needed)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'deploy'
+      - 'releases'
+      - 'promote'
+      - '--release=my-release'
+      - '--delivery-pipeline=my-pipeline'
+      - '--region=us-central1'
+      - '--project=enhub-cloud-interns'
 
 images:
   - 'us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app:latest'
