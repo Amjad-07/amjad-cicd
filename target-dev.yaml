@@ -1,0 +1,8 @@
+# target-dev.yaml
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: dev
+description: Dev environment
+run:
+  location: us-central1
