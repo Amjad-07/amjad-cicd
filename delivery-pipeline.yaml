@@ -1,0 +1,12 @@
+# delivery-pipeline.yaml
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: flask-pipeline
+description: Cloud Deploy pipeline for Flask app
+serialPipeline:
+  stages:
+  - targetId: dev
+    strategy:
+      standard:
+        verify: false
