@@ -1,0 +1,12 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: flask-app
+build:
+  artifacts:
+  - image: us-central1-docker.pkg.dev/enhub-cloud-interns/amjad-repo/my-app
+deploy:
+  cloudrun:
+    region: us-central1
+    projectId: enhub-cloud-interns
+    serviceName: flask-service
